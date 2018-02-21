@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 )
 
@@ -94,23 +95,36 @@ func main() {
 }*/
 
 //GetFullQueryString get full url string
-func (t *HashTag) GetFullQueryString() string {
+func (t *HashTag) GetFullQueryString() (string, error) {
 	//t2 := t.GetHmacWithKey()
 	//fmt.Println(t2)
-	return t.String() + "&hash=" + t.GetHmacWithKey()
+	h, err := t.GetHmacWithKey()
+
+	if err != nil {
+		return "", err
+	}
+
+	return t.String() + "&hash=" + h, nil
 }
 
 // GetHmacWithKey Get Hashed string with key
-func (t *HashTag) GetHmacWithKey() string {
+func (t *HashTag) GetHmacWithKey() (string, error) {
+
+	if t.key == "" {
+		return "", errors.New("need set key")
+	}
 
 	key := []byte(t.key)
 	message := []byte(t.String())
 
 	hash := hmac.New(sha256.New, key)
-	hash.Write(message)
+	_, err := hash.Write(message)
+	if err != nil {
+		return "", err
+	}
 
 	// now can directly use fmt.Printin(hash)
-	return fmt.Sprintf("%s", hex.EncodeToString(hash.Sum(nil)))
+	return fmt.Sprintf("%s", hex.EncodeToString(hash.Sum(nil))), nil
 	// below code need use fmt.Printf("%s",hash)
 	// so i cannot use the fmt.Printin later
 	//return hex.EncodeToString(hash.Sum(nil))
