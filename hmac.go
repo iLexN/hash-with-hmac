@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"fmt"
 )
 
 // HashKey key
@@ -123,11 +122,7 @@ func (t *HashTag) GetHmacWithKey() (string, error) {
 		return "", err
 	}
 
-	// now can directly use fmt.Printin(hash)
-	return fmt.Sprintf("%s", hex.EncodeToString(hash.Sum(nil))), nil
-	// below code need use fmt.Printf("%s",hash)
-	// so i cannot use the fmt.Printin later
-	//return hex.EncodeToString(hash.Sum(nil))
+	return hex.EncodeToString(hash.Sum(nil)), nil
 }
 
 // helper format string
